@@ -2,7 +2,7 @@
 title: "Class 7 R functions and packages"
 author: "Pratik Varade"
 date: "10/22/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -23,11 +23,11 @@ rescale(1:10)
 ```{r}
 rescale(c(1,10,5,NA,6))
 ```
-```{r}
-rescale2(c(1:10, "barry"))
+```{r, eval=FALSE}
+rescale2(c(1:10,"barry"))
 ```
 
-```{r}
+```{r , eval= FALSE}
 rescale(c(1:10, "Barry"))
 ```
 The error on the rescale 2 function is a lot more helpful than rescale.
@@ -129,7 +129,7 @@ stop(print("Inputs x and y should be the same length!"))
 
 
 Test
-```{r}
+```{r eval= FALSE}
 both_NA2(x,y3)
 ```
 
@@ -176,7 +176,7 @@ grade1 <- function(x) {
 
 
 We have out working code now turn it into a first function
-```{r}
+```{r, eval = FALSE}
 grade2 <- function(x) {
   if(any(is.na(x)))
     warning(print("This student is missing a homework"))
@@ -205,7 +205,7 @@ apply(hw, 1, grade1)
 
 
 Datapasta
-```{r}
+```{r , eval= FALSE}
 install.packages("datapasta")
 
 ```
