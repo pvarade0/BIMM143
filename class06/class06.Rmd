@@ -1,0 +1,154 @@
+---
+title: "Class6 R Functions"
+author: "Pratik Varade"
+date: "10/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# This is H1
+This is my work for class06 in **BIMM143**.
+
+```{r}
+# this is to demo a code chunk
+plot(1:10)
+```
+
+
+## Practice reading files (again)
+```{r}
+read.csv("test1.txt")
+read.csv("test2.txt", sep = "$" )
+#test3 has a tab and a space seperating, just use read.table
+read.table("test3.txt")
+
+```
+
+
+
+
+
+```{r}
+add <- function(x, y=1) {
+ # Sum the input x and y
+ x + y
+}
+```
+
+```{r}
+add (1)
+add (5)
+#this one we are overidding the y=1, so y=5
+add (5,5)
+#this is adding y to each of the components of the vector
+add (c(1,2,3))
+add ( c(1,2,3), 4)
+
+```
+
+
+
+
+
+```{r}
+rescale <- function(x) {
+ rng <-range(x)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+```
+
+
+
+```{r}
+rescale(1:10)
+```
+
+Test some
+```{r}
+rescale( c(1,2,NA,3,10) )
+
+```
+
+
+
+```{r}
+x <- c(1,2,NA,3,10)
+rng <- range(x)
+rng
+#NA is the max and min when you put it in as data, messes up the calculations. Put na.rm = TRUE to get rid of NA's from calculations
+rng <- range ( x, na.rm = TRUE)
+rng
+```
+
+
+
+
+```{r}
+rescale2 <- function(x) {
+ rng <-range(x, na.rm= TRUE)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+```
+
+```{r}
+rescale2(c(1,2,NA,3,10))
+```
+
+```{r}
+rescale3 <- function(x, na.rm=TRUE, plot=FALSE) {
+ rng <-range(x, na.rm=na.rm)
+ print("Hello")
+ answer <- (x - rng[1]) / (rng[2] - rng[1])
+  print("is it me you are looking for?")
+ if(plot) {
+ plot(answer, typ="b", lwd=4)
+ }
+ print("I can see it in ...")
+ return(answer)
+}
+```
+
+```{r}
+rescale3(1:10, plot = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+# Secrion 2 of hands-on Sheet
+Install the **bio3d** package for sequence and structure analysis
+```{r}
+#install.packages("bio3d")
+```
+
+```{r}
+library(bio3d)
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s1, chain="A", elety="CA")
+
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+
+
+
