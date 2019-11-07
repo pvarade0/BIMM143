@@ -1,0 +1,63 @@
+---
+title: "Class 11: Structural Bioinformatics 1"
+author: "Pratik Varade"
+date: "11/5/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The PDB database for biomolecular structure data
+
+> Q1: Determine the percentage of PDB structures solved by X-ray and Electron microscopy.
+
+>What proportion of structures are protein. 
+
+Download a CSV file from the PDB site (accessible from “Analyze” -> “PDB Statistics” > “by Experimental Method and Molecular Type”
+```{r}
+#read CSV file
+data <- read.csv("Data Export Summary.csv")
+data
+View(data)
+```
+Total Number of Entries
+```{r}
+sum(data$Total)
+```
+Total number of entries from each method (XRAY NMR ELECTRON MICROSCOPY OTHER MULTIMETHOD respectively)
+```{r}
+(data$Total/sum(data$Total))*100
+```
+Proportion that are protein (round = round to how much ever sig figs)
+```{r}
+sum(data$Total)
+sum(data$Proteins)
+
+round ((sum(data$Proteins)/sum(data$Total)) *100, 2)
+```
+
+
+
+## HIV-Pr structure analysis
+Can't see the hydrogens on VMD because the resolution of the experiement was too big to see the hydrogen molecules.
+
+VMD > Graphics -> representation > and then you can have multiple representations at the same time by pressing Create Rep. Double click to enable and disable (red text).
+
+
+Here we will read the 1HSG PDB structure and select the protein component and write out a new **protein - only** PDB formate file. We then do the same for the ligand (ie known drug molecule) creating a **ligand-only** PDB file.
+```{r}
+library(bio3d)
+#read PDB file
+pdb <- read.pdb("1hsg.pdb")
+pdb
+
+```
+
+```{r}
+ligand <- atom.select(pdb,"ligand", value= TRUE )
+write.pdb(ligand, file="1hsg_ligand.pdb")
+```
+
+
