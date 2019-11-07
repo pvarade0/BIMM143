@@ -30,3 +30,12 @@ write.pdb(ligand, file="1hsg_ligand.pdb")
 ```
  
  Put in the 1hsg_protein.pdbqt/ligand file that we made in AutoDockTool
+ 
+ Processing our docking results
+```{r}
+library(bio3d)
+res <- read.pdb("all.pdbqt", multi=TRUE)
+write.pdb(res, "results.pdb")
+```
+ 
+ 
