@@ -1,0 +1,250 @@
+---
+title: "class14"
+author: "Pratik Varade"
+date: "11/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Part 1 : Install Bioconductor/DESeq2 Setup
+We will use the DESeq2 package from bioconductor. To install this we ran **in the console **
+----**Note** eval= FALSE, just so it doesn't actually run because I already ran it in console.
+```{r eval = FALSE}
+install.packages("BiocManager")
+BiocManager::install()
+# For this class, you'll also need DESeq2:
+BiocManager::install("DESeq2")
+```
+
+##Part 2:  Import countData and  colData
+```{r}
+counts <- read.csv("airway_scaledcounts.csv", stringsAsFactors = FALSE)
+metadata <-  read.csv("airway_metadata.csv", stringsAsFactors = FALSE)
+```
+
+Take a look at these files :
+```{r}
+head(counts)
+head(metadata)
+```
+
+How many genes do we have in this data set?
+```{r}
+nrow(counts)
+```
+
+How many exp do we have?
+```{r}
+ncol(counts)
+```
+
+Part 3: Toy differential gene expression
+## perform some exploratory differential gene expression analysis
+ 
+```{r}
+View(metadata)
+```
+We have to find the mean of all the control groups data. We are doing this to find out if there is a difference in expression values for control (non-drug), vs treated (drug added to cell).
+
+
+
+First step: Find all the control experiments, and then average all of them. Then we do the same for all the drug experiments.
+
+
+
+
+```{r}
+control <- metadata[metadata[,"dex"]=="control",]
+control$id
+```
+
+Now we can calculate the mean across control columns of **countdata**
+
+```{r}
+control.mean <- rowSums( counts[ ,control$id] )/length(control$id)
+names(control.mean) <- counts$ensgene
+```
+
+Now its time to do the same thing for the drug experiments.
+```{r}
+treated <- metadata[metadata[,"dex"]=="treated",]
+treated$id
+```
+Now we can calc the mean across treated columns of countdata.
+```{r}
+treated.mean <- rowSums( counts[ ,treated$id] )/length(treated$id)
+names(treated.mean) <- counts$ensgene
+```
+
+
+We will combine our meancount data for bookkeeping purposes.
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+```
+
+
+Plot control vs Treated.
+```{r}
+plot(meancounts$control.mean, meancounts$treated.mean)
+```
+
+
+The plot above is too conjested in the beginning. I need to spread out the plot so trends can be seen.
+
+```{r}
+plot(meancounts$control.mean, meancounts$treated.mean, log="xy")
+```
+
+
+Make a log2 function.
+```{r}
+meancounts$log2fc <-log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+head(meancounts)
+```
+
+The NaN and -inf is from doing math with 0's. We have to filter out the genes with 0 experession.
+```{r}
+zero.vals <- which(meancounts[,1:2]==0, arr.ind=TRUE)
+
+to.rm <- unique(zero.vals[,1])
+mycounts <- meancounts[-to.rm,]
+head(mycounts)
+
+```
+
+**Testing what arr.ind = TRUE does**. It just tells you where on the dataset the 0 value is. So there are 3 0's (1, 2, 3), and the coordinates are given in the row/column. 
+```{r}
+x<- data.frame(control=c(56,0,5), treated=c(26,0,0))
+x
+which(x==0, arr.ind = TRUE)
+```
+
+
+
+
+
+```{r}
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+```
+We sum up.ind because true = 1 and false = 0. So if we add them, we should get how many are True.
+```{r}
+sum(up.ind)
+```
+
+```{r}
+head(mycounts[up.ind,])
+```
+Let’s do this the right way. DESeq2 is an R package for analyzing count-based NGS data like RNA-seq. It is available from Bioconductor. Bioconductor is a project to provide tools for analyzing high-throughput genomic data including RNA-seq, ChIP-seq and arrays.
+
+```{r}
+library(DESeq2)
+citation("DESeq2")
+```
+
+We will use the DESeqDataSetFromMatrix() function to build the required DESeqDataSet object and call it dds, short for our DESeqDataSet. 
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=metadata, 
+                              design=~dex, 
+                              tidy=TRUE)
+dds
+```
+
+
+Run DESEQ2
+```{r}
+dds <- DESeq(dds)
+```
+Look at the results
+```{r}
+res <- results(dds)
+res
+```
+
+## Making a summary plot (Volcano Plot)
+This figure will combine both Change and the p-value into the overview figure indicating the proportion of genes with large scale significant difference in their expression.
+
+```{r}
+#This graph is dull, and hard to read. Add color.
+plot(res$log2FoldChange, -log(res$padj))
+abline(v=c(-2,2), col="gray", lty=2)
+abline(h=-log(0.05), col="gray", lty = 2)
+```
+
+```{r}
+mycol <- rep("gray", nrow(res))
+#make points with +2 -2 fold change blue
+mycols [abs(res$log2FoldChange) >2] <- "blue"
+#make points below pvalue cutoff red.
+plot( res$log2FoldChange,  -log(res$padj), 
+ col=res$sig+1, ylab="-Log(P-value)", xlab="Log2(FoldChange)")
+
+# Add some cut-off lines
+abline(v=c(-2,2), col="darkgray", lty=2)
+abline(h=-log(0.1), col="darkgray", lty=2)
+```
+Set up some custom color so we can read the plot better.
+```{r}
+# Setup our custom point color vector 
+mycols <- rep("gray", nrow(res))
+mycols[ abs(res$log2FoldChange) > 2 ]  <- "red" 
+
+inds <- (res$padj < 0.01) & (abs(res$log2FoldChange) > 2 )
+mycols[ inds ] <- "blue"
+
+#Volcano plot with custom colors 
+plot( res$log2FoldChange,  -log(res$padj), 
+ col=mycols, ylab="-Log(P-value)", xlab="Log2(FoldChange)" )
+
+abline(v=c(-2,2), col="gray", lty=2)
+abline(h=-log(0.1), col="gray", lty=2)
+```
+
+Save our results for the next day
+```{r}
+write.csv(res, file="expression_results.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
