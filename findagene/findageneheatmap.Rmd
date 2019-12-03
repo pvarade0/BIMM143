@@ -1,0 +1,53 @@
+---
+title: "project"
+author: "Pratik Varade"
+date: "12/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+y <- read.fasta("out.txt")
+y
+```
+
+```{r}
+x <- read.fasta("sample.fasta")
+x
+```
+
+```{r}
+data <- seqidentity(x)
+```
+
+```{r}
+heatmap(data, margins = c(11,11))
+
+```
+
+```{r}
+consensus(data)
+```
+```{r}
+blast.pdb(y)
+```
+```{r}
+pdb.annotate("4WW3_A")
+```
+```{r}
+pdb.annotate("6FK6_A")
+```
+
+```{r}
+pdb.annotate("5ZBQ_A")
+```
+
