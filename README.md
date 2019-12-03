@@ -15,6 +15,6 @@ This is my work from [BIMM143 at UC San Diego](https://bioboot.github.io/bimm143
 - Class14: [Transcriptomics and the analysis of RNA-Seq data](https://github.com/pvarade0/BIMM143/blob/master/class14/class14.md)
 - Class15: [Genome annotation and the interpretation of gene lists](https://github.com/pvarade0/BIMM143/blob/master/class15/class15.md)
 - Class16:  Essential UNIX for bioinformatics
-- Class17: [Biological network analysis](https://github.com/pvarade0/BIMM143/blob/master/class17/class17.md)
+- Class17: [Biological network analysis](https://github.com/pvarade0/BIMM143/tree/master/class17)
 - Class18: [Cancer genomics](https://github.com/pvarade0/BIMM143/blob/master/Class18/class18.md)
 - Project Work: [Find-A-Gene Project](https://github.com/pvarade0/BIMM143/blob/master/findagene/findageneheatmap.md)
