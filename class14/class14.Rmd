@@ -2,7 +2,7 @@
 title: "class14"
 author: "Pratik Varade"
 date: "11/12/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -179,7 +179,7 @@ abline(h=-log(0.05), col="gray", lty = 2)
 ```{r}
 mycol <- rep("gray", nrow(res))
 #make points with +2 -2 fold change blue
-mycols [abs(res$log2FoldChange) >2] <- "blue"
+mycol [abs(res$log2FoldChange) >2] <- "blue"
 #make points below pvalue cutoff red.
 plot( res$log2FoldChange,  -log(res$padj), 
  col=res$sig+1, ylab="-Log(P-value)", xlab="Log2(FoldChange)")
